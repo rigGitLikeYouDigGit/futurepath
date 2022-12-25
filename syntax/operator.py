@@ -64,31 +64,7 @@ class SetField(Atom.base()):
 	def value(self, value:Atom):
 		self.terms[2] = value
 
-class FieldCondition(Atom.base()):
-	"""check for field with certain value"""
 
-	def __init__(self, owner:(Atom, T.Type[Atom]), field:Field.T(),  value:Atom):
-		Atom.base().__init__(self, owner, field, value)
 
-	@property
-	def owner(self)->Atom:
-		return self.terms[0]
-	@owner.setter
-	def owner(self, value:Atom):
-		self.terms[0] = value
-
-	@property
-	def field(self)->Field.T():
-		return self.terms[1]
-	@field.setter
-	def field(self, value:Field.T()):
-		self.terms[1] = value
-
-	@property
-	def value(self)->Atom:
-		return self.terms[2]
-	@value.setter
-	def value(self, value:Atom):
-		self.terms[2] = value
 
 

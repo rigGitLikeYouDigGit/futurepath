@@ -15,6 +15,7 @@ from futurepath.syntax.action import Action
 from futurepath.syntax.operator import *
 from futurepath.syntax.goal import Goal
 
+"""expand and resolve expressions in preparation for generating graph"""
 
 class ExpressionVisitor(Visitor):
 	"""recurse through expression tree and replace symbols

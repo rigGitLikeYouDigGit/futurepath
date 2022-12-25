@@ -14,6 +14,19 @@ class Field(TypeNamespace):
 		"""physical location of object"""
 		pass
 
+	class Holding(_Base):
+		"""object holds by another object"""
+		pass
+	class HeldBy(_Base):
+		"""object held by another object
+		can we define some kind of 'relationship' here,
+		instead of loads of different fields?"""
+		pass
+
+	class Contains(_Base):
+		"""object contained by another object"""
+		pass
+
 	pass
 
 

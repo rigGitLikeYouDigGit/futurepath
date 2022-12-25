@@ -61,12 +61,9 @@ class Atom(TypeNamespace):
 			# print("eq", self, other, object.__eq__(self, other))
 			# return object.__eq__(self, other)
 
-		# def __repr__(self):
-		# 	baseStr = repr(self.terms)
-		# 	return f"{self.__class__.__name__}( {baseStr} )"
-		#
-		# def __str__(self):
-		# 	return repr(self)
+		def copy(self)->Atom:
+			return type(self)(*(i.copy() for i in self.terms))
+
 
 		def _flattenDepthFirst(self)->list[Atom]:
 			"""top down, depth first"""
@@ -116,7 +113,7 @@ class Atom(TypeNamespace):
 		"""
 		terminal = True
 		def __init__(self, value):
-			super(Atom.Constant, self).__init__(value)
+			Atom._Base.__init__(self, value)
 			#self.value = value
 
 		def __repr__(self):
@@ -133,12 +130,16 @@ class Atom(TypeNamespace):
 		def value(self, value):
 			self.terms[0] = value
 
-		# def eval(self, symbolMap:dict) ->Atom:
-		# 	return self
 
-# common constants
+	# # common constants
+	# success = Constant("success")
+	# failure = Constant("failure")
+
+
+# # common constants
 success = Atom.Constant("success")
 failure = Atom.Constant("failure")
+#none = Atom.Constant(None)
 
 class Symbol(TypeNamespace, Atom.base()):
 	"""Specific atoms representing a relative value or object, to be resolved
@@ -155,6 +156,11 @@ class Symbol(TypeNamespace, Atom.base()):
 
 	class Any(_Base): pass
 	class Actor(_Base) : pass
+
+	class Target(_Base):
+		"""if an action may be aimed at an object,
+		this will be replaced with it"""
+		pass
 
 
 class Condition(TypeNamespace, Atom.base()):
