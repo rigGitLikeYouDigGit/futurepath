@@ -1,0 +1,44 @@
+
+test for goal-oriented planning game ai agents -
+
+basically, every possible state of a game can be modelled as nodes in a graph -
+multiple states / nodes may be active at once
+
+edges between nodes represent actions agent may take to traverse between states -
+
+<State DoorClosed>  -> Action OpenDoor ->  <State DoorOpen>
+
+etc
+
+movement or "pathfinding" actions may be copied from graph of world positions
+
+
+
+consider having multiple different copies of the state graph, to represent agent knowledge -
+
+we have one master state graph, containing all actors and all truth of world
+
+one separate graph, representing world truth centralised on one specific agent? maybe not needed,
+could put multiple agents in main graph
+
+one further graph representing agent's KNOWLEDGE of world - if agent doesn't know door is locked, this graph
+will show it as open until they try it
+
+
+
+
+consider interest weighting in different squares and actions
+
+
+performance? efficiency? don't make me laugh
+
+
+
+
+for basics, how do we define conditions
+consider that planning ahead, saying "if i were in this state, what actions can I do",
+is equivalent to moving to that state
+
+
+
+
