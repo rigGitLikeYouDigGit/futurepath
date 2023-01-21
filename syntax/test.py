@@ -57,7 +57,8 @@ pickUpAction.result = [SetField(Symbol.Actor, Field.Holding, Symbol.Target)]
 
 putDownAction = Action("putDown")
 putDownAction.reqs = [Condition.NotEqual(GetField(Symbol.Actor, Field.Holding), None)]
-putDownAction.result = [SetField(Symbol.Actor, Field.Holding, None)]
+putDownAction.result = [SetField(Symbol.Actor, Field.Holding, None),
+                        SetField(Symbol.Target, Field.Location, GetField(Symbol.Actor, Field.Location))]
 
 # define actions, directed moves between locations
 aGoToB = Action("aGoToB")
