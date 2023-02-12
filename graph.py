@@ -2,19 +2,14 @@
 from __future__ import annotations
 
 import networkx as nx
-import pprint
-from tree.lib.object import UidElement
+from field import GetField, SetField
 
-from futurepath.syntax.atom import Atom, Condition, Symbol
-from futurepath.syntax.field import Field
-from futurepath.syntax.object import Object
-from futurepath.syntax.actor import Actor
-from futurepath.syntax.action import Action
-from futurepath.syntax.operator import *
-from futurepath.syntax.goal import Goal
-from futurepath.syntax.eval import ExpressionVisitor
+from futurepath.condition import Condition
+from futurepath.actor import Actor
+from futurepath.action import Action
+from futurepath.condition import *
 
-from futurepath.syntax.world import WorldState
+from futurepath.world import WorldState
 
 """evaluating graph might get properly crazy
 
@@ -26,7 +21,7 @@ since at each action taken, the state of the HYPO graph might change
 
 while EXECUTING, entire process should be run after each real action taken anyway
 
-
+some actions or relations may expand the graph, symbolically represent other bits of it, etc
 """
 
 
@@ -112,3 +107,26 @@ def getPlans(world:WorldState)->dict[Actor, list[Action]]:
 	return actorActionMap
 
 
+def getConcreteGoalPlan(actor:Actor, goal:Goal, allActions:list[Action]) -> list[Action]:
+	"""check if there is an explicit action path readily available
+	among actions"""
+
+def goalPlan(actor:Actor, goal:Goal, allActions:list[Action]) -> list[Action]:
+	"""build a plan for the agent to achieve a specific goal
+	first check if there is a valid plan among the actions present -
+	if a concrete chain exists, return it
+	if not, then we need to get a bit creative
+	"""
+
+	# try working outwards from Actor, and backwards from goal
+
+
+
+
+
+def buildActionPlan(actor:Actor, allActions:list[Action]) -> list[Action]:
+	"""build a plan for the agent to achieve its goals"""
+	plans = [goalPlan(actor, i, allActions) for i in actor.goals]
+	return plans
+
+#print(buildActionPlan(agent, allActions))

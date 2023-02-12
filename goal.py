@@ -1,38 +1,45 @@
 
-"""holds object defining goals, weighting, completion requirements etc
-completion best modelled as combination of states
-"""
-
-from futurepath.core import State
-from futurepath.gameobject import GameObject
-from futurepath.worldtile import WorldTile, WorldMap
 
 
-class Goal:
-	"""goals themselves are ignorant of goal owner?
-	they may be tested as if an arbitrary object owns them,
-	and if requiredStates are true for that object,
-	goal is complete"""
+from __future__ import annotations
+from tree.lib.object import UidElement, NamedElement
 
+import typing as T
+
+from futurepath.syntax.atom import Atom, Condition
+from futurepath.field import Field
+
+class Goal(NamedElement, Atom.base()):
+	"""goals define a desired state of the world, as a map of
+	{ object : set of conditions to satisfy }
+
+	intenally, it's most consistent to store raw list of conditions
+
+	"""
 	def __init__(self,
-	             requiredStates:tuple[State]=(),
-	             requiredNotStates:tuple[State]=(),
+	             conditions:list[Condition._Base],
+	             # conditions:dict[(Atom, Object), list[Condition.base()]],
+	             name="goal"
 	             ):
-		self.requiredStates = requiredStates
-		self.requiredNotStates = requiredNotStates
+		NamedElement.__init__(self, name)
+		Atom.base().__init__(self, *conditions)
+
+	def __repr__(self):
+		return NamedElement.__repr__(self)
 
 
-class GoHereGoal(Goal):
-	"""might not need separate classes -
-	this directs an agent to a specific world tile"""
-
-	def __init__(self,tile:WorldTile):
-		super(GoHereGoal, self).__init__()
-		self.tile = tile
+	def __str__(self):
+		return repr(self)
 
 
+	def _visitTraverse(self, masterVisitRecursiveFn,
+                   visitArgsKwargs=((), {})):
+		"""bit of messiness here, could conform Goal to use the same
+		initialiser signature as other atoms"""
 
+		visitedTerms = tuple(masterVisitRecursiveFn(i,
+			                       *visitArgsKwargs[0],
+			                       **visitArgsKwargs[1])
+				for i in self.terms)
 
-
-
-
+		return type(self)( visitedTerms, self.name )

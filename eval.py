@@ -7,13 +7,13 @@ from dataclasses import dataclass
 from tree.lib.object import UidElement
 from tree.lib.visit import Visitor
 
-from futurepath.syntax.atom import Atom, Condition, Symbol
-from futurepath.syntax.field import Field
-from futurepath.syntax.object import Object
-from futurepath.syntax.actor import Actor
-from futurepath.syntax.action import Action
-from futurepath.syntax.operator import *
-from futurepath.syntax.goal import Goal
+from futurepath.syntax.atom import Atom, Symbol
+from futurepath.field import Field
+from futurepath.object import Object
+from futurepath.actor import Actor
+from futurepath.action import Action
+from futurepath.condition import *
+from futurepath.goal import Goal
 
 """expand and resolve expressions in preparation for generating graph"""
 

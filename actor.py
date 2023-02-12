@@ -7,9 +7,9 @@ from tree.lib.object import UidElement
 import typing as T
 
 from futurepath.syntax.atom import Atom, Condition
-from futurepath.syntax.field import Field
-from futurepath.syntax.object import Object
-from futurepath.syntax.goal import Goal
+from futurepath.field import Field
+from futurepath.object import Object
+from futurepath.goal import Goal
 
 class Actor(Object):
 	"""an actor is an object that can perform actions,

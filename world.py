@@ -3,17 +3,13 @@
 from __future__ import annotations
 
 import networkx as nx
-import pprint
-from tree.lib.object import UidElement
 
-from futurepath.syntax.atom import Atom, Condition, Symbol
-from futurepath.syntax.field import Field
-from futurepath.syntax.object import Object
-from futurepath.syntax.actor import Actor
-from futurepath.syntax.action import Action
-from futurepath.syntax.operator import *
-from futurepath.syntax.goal import Goal
-from futurepath.syntax.eval import ExpressionVisitor
+from futurepath.field import Field
+from futurepath.object import Object
+from futurepath.actor import Actor
+from futurepath.action import Action
+from futurepath.condition import *
+from eval import ExpressionVisitor
 
 """container for actors, objects and actions
 """

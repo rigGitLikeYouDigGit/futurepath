@@ -13,10 +13,11 @@ of reinventing here
 import typing as T
 from tree.lib.object.namespace import TypeNamespace
 from tree.lib.visit import Visitable
+from copy import deepcopy
 
 
 if T.TYPE_CHECKING:
-	from .field import Field
+	from field import Field
 
 
 class AtomScope:
@@ -61,8 +62,17 @@ class Atom(TypeNamespace):
 			# print("eq", self, other, object.__eq__(self, other))
 			# return object.__eq__(self, other)
 
+		def isNumeric(self)->bool:
+			"""does this atom represent a numeric value?"""
+			return isinstance(self.value, (int, float))
+
+		def isDiscrete(self)->bool:
+			"""does this atom represent a discrete value, which cannot be interpolated?"""
+			return isinstance(self.value, (str, bool, type))
+
 		def copy(self)->Atom:
 			return type(self)(*(i.copy() for i in self.terms))
+
 
 
 		def _flattenDepthFirst(self)->list[Atom]:
@@ -113,6 +123,9 @@ class Atom(TypeNamespace):
 		"""
 		terminal = True
 		def __init__(self, value):
+			# creating constant around another constant copies it
+			if isinstance(value, Atom.Constant):
+				value = value.value
 			Atom._Base.__init__(self, value)
 			#self.value = value
 
@@ -139,7 +152,6 @@ class Atom(TypeNamespace):
 # # common constants
 success = Atom.Constant("success")
 failure = Atom.Constant("failure")
-#none = Atom.Constant(None)
 
 class Symbol(TypeNamespace, Atom.base()):
 	"""Specific atoms representing a relative value or object, to be resolved
@@ -154,7 +166,7 @@ class Symbol(TypeNamespace, Atom.base()):
 		# def eval(self, symbolMap:dict) ->Atom:
 		# 	return symbolMap[self.value]
 
-	class Any(_Base): pass
+
 	class Actor(_Base) : pass
 
 	class Target(_Base):
@@ -162,31 +174,21 @@ class Symbol(TypeNamespace, Atom.base()):
 		this will be replaced with it"""
 		pass
 
+	# semantic stuff
+	class All(_Base):
+		"""semantically shows 'all'
+		possible this should be a Symbol instead"""
 
-class Condition(TypeNamespace, Atom.base()):
-	"""Represent logical comparison between values
-	NO IDEA how this might actually work
-	"""
+	class Any(_Base):pass
 
-	class _Base(Atom.base()):
-		"""base for all conditions"""
-		# def __init__(self, *terms):
-		# 	self.terms = terms
+	class None_(_Base):pass
 
+	class One(_Base):
+		"""semantic for 'a single one', not literally the number 1"""
 
-	class Equal(_Base):
-		pass
-
-	class NotEqual(_Base):
-		pass
+	class AllButOne(_Base):	pass
 
 
-# class GetField(Atom.base()):
-# 	"""signify field lookup in expression"""
-#
-# 	def __init__(self, field:Field.T(), owner:Atom):
-# 		self.field = field
-# 		self.owner = owner
 
 
 

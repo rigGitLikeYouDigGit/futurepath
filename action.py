@@ -7,11 +7,8 @@ from tree.lib.object import UidElement, NamedElement
 import typing as T
 
 from futurepath.syntax.atom import Atom, Condition
-from futurepath.syntax.field import Field
-from futurepath.syntax.operator import GetField, SetField, FieldCondition
-
-
-
+from futurepath.field import Field
+from field import GetField, SetField
 
 
 class Action(NamedElement, Atom.base()):
