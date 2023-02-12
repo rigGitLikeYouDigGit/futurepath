@@ -50,11 +50,23 @@ class Atom(TypeNamespace):
 			# create terms array
 			self.terms: list[Atom.base()] = list(terms)
 
+			# atoms given an original unresolved copy, as originally defined
+			# can be useful to compare with resolved version
+			# maybe even multiple? to record each resolution step?
+			self.originalCopy : Atom = None
+
 		def __iter__(self):
 			return iter(self.terms)
 
 		def __hash__(self):
 			return hash(tuple(self.terms))
+
+		def __repr__(self):
+			return f"{self.__class__.__name__}{self.terms}"
+
+		def __str__(self):
+			return f"{self.__class__.__name__}{self.terms}"
+
 
 		def __eq__(self, other):
 			"""I have absolutely no idea why this is necessary"""
@@ -173,6 +185,9 @@ class Symbol(TypeNamespace, Atom.base()):
 		"""if an action may be aimed at an object,
 		this will be replaced with it"""
 		pass
+
+	class Subject(_Base): pass
+	class Object(_Base): pass
 
 	# semantic stuff
 	class All(_Base):

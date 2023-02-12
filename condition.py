@@ -10,6 +10,7 @@ from futurepath.syntax.atom import Atom
 
 if T.TYPE_CHECKING:
 	from futurepath.world import WorldState
+	from futurepath.graph import FPGraph
 
 """bits of expressions showing active modification
 of the graph
@@ -20,8 +21,12 @@ better inferred - more explicit seems best at this early stage
 
 
 class CompareMode(TypeNamespace, Atom.base()):
-	"""different ways of comparing values- numeric, absolute (like strings), graph state-space distance etc
+	"""different ways of comparing values- numeric, graph state-space distance etc
 	likely overkill making this itself an atom, but a bit of reflection never hurt anyone
+
+	strings are still handled as graph distance for now, which is obviously crazy overkill,
+	but it unifies the interface (we assume that any string represents some state in the graph,
+	whether that is connected to other states or not)
 
 
 	graph distance - is it possible to model different "axes" within the graph?
@@ -34,7 +39,6 @@ class CompareMode(TypeNamespace, Atom.base()):
 
 	class _Base(Atom.base()): pass
 	class Numeric(_Base): pass
-	class Absolute(_Base): pass
 	class GraphDistance(_Base): pass
 
 class Condition(TypeNamespace, Atom.base()):
@@ -49,7 +53,7 @@ class Condition(TypeNamespace, Atom.base()):
 		# def __init__(self, *terms):
 		# 	self.terms = terms
 
-		def getError(self, world:WorldState):
+		def getError(self, world:WorldState, graph:FPGraph)->list[float]:
 			"""return error value for this condition"""
 			raise NotImplementedError
 
@@ -64,9 +68,28 @@ class Condition(TypeNamespace, Atom.base()):
 			else if they are all numeric, do a basic float operation"""
 			if all(i.isNumeric() for i in self.terms):
 				return CompareMode.Numeric
-			return all(isinstance(i, Atom.Constant) for i in self.terms)
+			return CompareMode.GraphDistance
 
-		def getError(self, world:WorldState)->list[float]:
+		def _getErrorNumeric(self, world:WorldState)->list[float]:
+			"""return error value for this condition"""
+			try:
+				average = sum(self.terms) / len(self.terms)
+			except TypeError:
+				return 1
+			return [abs(i - average) for i in self.terms]
+
+		def _getErrorGraphDistance(self, world:WorldState, graph:FPGraph)->list[float]:
+			"""return error value for this condition
+			for simplicity, if any constant terms are found, those are the 'base'
+
+			difficulty here that some terms may not show what field they refer to -
+			eg Equal( GetField(Object, Type), "human" )
+			is perfectly readable, but current system can't understand it
+			"""
+			defaultField
+
+
+		def getError(self, world:WorldState, graph:FPGraph)->list[float]:
 			""" run after terms are evaluated in world
 
 			return error value for each term, to return to average
@@ -77,12 +100,14 @@ class Condition(TypeNamespace, Atom.base()):
 			returns float value for each term
 
 			here we don't know what these values are, only their results
+			but we DO need to know what fields they relate to - it's meaningless to
+			compare 'locA' and 'human' without knowing one is a location and one is a type
+
 			"""
 
-			for i in self.terms:
-				if isinstance(i, Atom.Constant):
-					target = i.value
-
+			mode = self.checkTermsMode(world)
+			if mode is CompareMode.Numeric:
+				return self._getErrorNumeric(world)
 
 
 

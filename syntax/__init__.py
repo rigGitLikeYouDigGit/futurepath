@@ -6,7 +6,7 @@ between parts of network"""
 import typing as T
 
 
-from .atom import Atom, Symbol, Condition
+from .atom import Atom, Symbol
 # add atoms to global ns
 globals().update(Atom.members())
 #

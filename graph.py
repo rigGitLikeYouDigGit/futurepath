@@ -24,6 +24,8 @@ while EXECUTING, entire process should be run after each real action taken anywa
 some actions or relations may expand the graph, symbolically represent other bits of it, etc
 """
 
+class FPGraph(nx.DiGraph):
+	pass
 
 def buildActionGraph(worldState:WorldState)->nx.DiGraph:
 	actors = worldState.actors

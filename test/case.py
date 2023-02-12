@@ -1,6 +1,9 @@
 
 
 from __future__ import annotations
+import networkx as nx
+import matplotlib
+from copy import deepcopy
 
 from futurepath.syntax.atom import Symbol
 from futurepath.field import Field
@@ -10,6 +13,7 @@ from futurepath.filter import Filter
 from futurepath.goal import Goal
 from futurepath.graph import *
 from futurepath import component
+from futurepath.world import WorldState
 
 
 """world map:
@@ -97,17 +101,112 @@ for i in range(3):
 
 print("letters")
 print(letters)
+
+
 # define goals
-
-
 lettersAtCGoal = Goal(
 	[Condition.Equal(
 		Measure.Count(Filter(
 			Condition.Equal(GetField(Symbol.Object, Field.Type), Constant("letter")),
 			Condition.Equal(GetField(Symbol.Object, Field.Location), locC))),
 	3)],
-
 		)
+
+agent.goals.append(lettersAtCGoal)
+
+allActors = [agent]
+allObjects = [*letters, agent]
+allActions = [aGoToB, bGoToA, bGoToC, cGoToB]
+
+world = WorldState(
+	allActors, allObjects, allActions
+)
+
+
+def buildBaseGraph(worldState:WorldState)->nx.DiGraph:
+	"""build initial unexpanded, unresolved graph - this may give insight not available
+	at an expanded level
+	test using (field, value) ties
+	"""
+
+	graph = nx.DiGraph()
+	for obj in worldState.objects:
+		graph.add_node(obj)
+		for field, value in obj.fieldMap.items():
+			# graph.add_node((actor, field, value))
+			# graph.add_edge(actor, (actor, field, value))
+			graph.add_node((field, value))
+			graph.add_edge(obj, (field, value))
+	return graph
+
+baseGraph = buildBaseGraph(world)
+
+def specialiseActorGraph(baseGraph:nx.DiGraph, actor:Actor, worldState:WorldState)->nx.DiGraph:
+	"""given a general world graph, make graph specific to actor by adding actor's goals"""
+	actorGraph = deepcopy(baseGraph)
+
+
+
+
+# nx.draw_networkx(baseGraph)
+# matplotlib.pyplot.show()
+# while True:
+# 	pass
+
+
+def buildActionGraph(worldState:WorldState)->nx.DiGraph:
+	actors = worldState.actors
+	objects = worldState.objects
+	allActions = worldState.actions
+
+	graph = nx.DiGraph()
+	# add actions and discrete (object, field, value) states
+	# as nodes
+
+	for actor in actors:
+		# field values should all be resolved at this stage
+		# test adding actor as node
+		graph.add_node(actor)
+		for field, value in actor.fieldMap.items():
+			graph.add_node((actor, field, value))
+			graph.add_edge(actor, (actor, field, value))
+
+		# add goals
+		for goal in actor.goals:
+			graph.add_node(goal)
+			for condition in goal.terms:
+				if isinstance(condition, Condition.Equal):
+					if isinstance(condition.terms[0], GetField):
+						nodeTie = (condition.terms[0].owner,
+						           condition.terms[0].field,
+						           condition.terms[1])
+						graph.add_node(nodeTie)
+						graph.add_edge(nodeTie, goal)
+
+
+	for action in allActions:
+		graph.add_node(action)
+
+		for result in action.result:
+			if isinstance(result, SetField):
+				nodeTie = (result.owner, result.field, result.value)
+				graph.add_node(nodeTie)
+				graph.add_edge(action, nodeTie)
+
+		for reqCondition in action.reqs:
+			# sweater spaghetti and cringe abound here
+			# literally no idea how to represent conditions in graph
+			if isinstance(reqCondition, Condition.Equal):
+				if isinstance(reqCondition.terms[0], GetField):
+					nodeTie = (reqCondition.terms[0].owner,
+					           reqCondition.terms[0].field,
+					           reqCondition.terms[1]
+					           )
+					graph.add_node(nodeTie)
+					graph.add_edge(nodeTie, action)
+
+	return graph
+
 
 """
 3 letters at c
@@ -164,14 +263,4 @@ objects satisfying type=letter - obviously just letters.
 	
 
 """
-
-
-
-# goToCGoal = Goal(
-#
-# 		[Condition.Equal(GetField(Symbol.Actor, Field.Location), locC)],
-# 		name="goToCGoal")
-#
-#
-# allActions = [aGoToB, bGoToA, bGoToC, cGoToB]
 

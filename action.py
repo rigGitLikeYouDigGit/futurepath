@@ -6,7 +6,8 @@ from tree.lib.object import UidElement, NamedElement
 
 import typing as T
 
-from futurepath.syntax.atom import Atom, Condition
+from futurepath.syntax.atom import Atom
+from futurepath.condition import Condition
 from futurepath.field import Field
 from field import GetField, SetField
 
